@@ -1,6 +1,7 @@
 const listing = require("../models/listing.js");
 const { cloudinary } = require("../cloudinary");
 const axios = require("axios");
+const expresserror = require("../utils/expresserror.js");
 
 module.exports.index = async (req, res) => {
     const allListings = await listing.find({});
@@ -19,7 +20,7 @@ module.exports.showListing = async (req, res, next) => {
     if (!llisting) {
         return next(new expresserror(404, "Listing not found"));
     }
-    res.render("listings/show.ejs", { llisting });
+   return res.render("listings/show.ejs", { llisting });
 };
 
 module.exports.createListing = async (req, res) => {
@@ -66,19 +67,19 @@ module.exports.createListing = async (req, res) => {
 
         await newlisting.save();
         req.flash("success", "new listing created");
-        res.redirect("/listings");
+      return  res.redirect("/listings");
 
     } catch (err) {
         console.error("Error in createListing:", err.message);
         req.flash("error", "Error creating listing: " + err.message);
-        res.redirect("/listings/new");
+      return  res.redirect("/listings/new");
     }
 };
 
 module.exports.renderEditForm = async (req, res) => {
     let { id } = req.params;
     const llisting = await listing.findById(id);
-    res.render("listings/edit.ejs", { llisting });
+   return res.render("listings/edit.ejs", { llisting });
 };
 
 module.exports.updateListing = async (req, res) => {
@@ -115,12 +116,12 @@ module.exports.updateListing = async (req, res) => {
 
         await update.save();
         req.flash("success", "listing updated");
-        res.redirect(`/listings/${id}`);
+       return res.redirect(`/listings/${id}`);
 
     } catch (err) {
         console.error("Error in updateListing:", err.message);
         req.flash("error", "Error updating listing");
-        res.redirect(`/listings`);
+      return  res.redirect(`/listings`);
     }
 };
 
@@ -131,5 +132,5 @@ module.exports.destroyListing = async (req, res) => {
         await cloudinary.uploader.destroy(deletedListing.image.filename);
     }
     req.flash("success", "listing deleted");
-    res.redirect("/listings");
+   return res.redirect("/listings");
 };

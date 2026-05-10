@@ -23,7 +23,7 @@ newReview.author=req.user._id;
     await newReview.save();
     await foundListing.save();
     req.flash("success","new reveiw created");
-    res.redirect(`/listings/${id}`);
+   return res.redirect(`/listings/${id}`);
   };
 
 
@@ -33,5 +33,5 @@ newReview.author=req.user._id;
     await listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}});
     await review.findByIdAndDelete(reviewId);
     req.flash("success","review deleted");
-    res.redirect(`/listings/${id}`);
+   return res.redirect(`/listings/${id}`);
   };

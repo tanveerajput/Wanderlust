@@ -38,7 +38,7 @@ app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended:true}));
 app.use(methodoverride("_method"));
 app.engine("ejs",ejsmate);
-app.use(express.static(path.join(__dirname,"/public")));
+app.use(express.static(path.join(__dirname,"public")));
 
 
 const store = MongoStore.create({
@@ -46,7 +46,7 @@ const store = MongoStore.create({
   crypto: {
     secret: process.env.SECRET,
   },
-  touchAfter: 24 * 3600,
+  touchAfter: 24*3600,
 });
 
 store.on("error", (err) => {
@@ -112,6 +112,9 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = "Something went wrong" } = err;
+    if (res.headersSent) {
+    return next(err);
+  }
   res.status(statusCode).render("error.ejs",{message});
 
 });
