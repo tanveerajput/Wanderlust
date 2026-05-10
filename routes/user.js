@@ -10,7 +10,7 @@ const {saveRedirectUrl}=require("../middleware.js");
 router
 .route("/signup")
 .get(usercontroller.renderSignup)
-.post(wrapAsync(usercontroller.signup)
+.post(wrapasync(usercontroller.signup)
 );
 
 //login route
