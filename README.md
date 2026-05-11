@@ -7,161 +7,162 @@
 ![EJS](https://img.shields.io/badge/EJS-Templating-red)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-Image%20Storage-blue)
 
-Wanderlust is a full-stack travel listing web application inspired by Airbnb.  
-Users can explore travel destinations, create property listings, upload images, and leave reviews.
 
-This project demonstrates **RESTful API development, backend architecture, validation, database relationships, and cloud image storage integration.**
+A full-stack travel listing web application where users can explore destinations, create listings, upload images, leave reviews, authenticate securely, and view locations on an interactive map.
 
----
-
-# 🚀 Key Features
-
-- 🏠 Create, edit, and delete travel listings  
-- 🖼 Upload listing images using **Cloudinary**  
-- ⭐ Add and delete reviews with rating system  
-- ✔ Input validation using **Joi schema validation**  
-- 🔐 Middleware-based error handling  
-- 🔄 RESTful CRUD architecture  
-- 🧹 Automatic deletion of reviews when listing is deleted  
-- 🎨 Responsive UI built using **Bootstrap**
+🔗 **Live Website:** https://wanderlust-prpw.onrender.com/  
+🔗 **GitHub Repository:** https://github.com/tanveerajput/Wanderlust/
 
 ---
 
-# 🧠 Project Highlights
+# ✨ Features
 
-- Built a full-stack Airbnb-style listing platform using **Node.js, Express.js, MongoDB, and EJS**
-- Designed **RESTful APIs** for managing listings and reviews
-- Implemented **middleware-driven validation and centralized error handling**
-- Integrated **Cloudinary + Multer** for image upload and storage
-- Structured backend using **modular architecture (models, utilities, middleware)**
+- 🏠 Create, Edit & Delete travel listings with full CRUD support
+- 🖼 Image Upload via Cloudinary + Multer
+- 🗺 Interactive Maps using Leaflet.js + OpenStreetMap + Nominatim geocoding
+- ⭐ Review System with star ratings and comments
+- 🔐 User Authentication — Signup, Login, Logout using Passport.js
+- 🛡 Authorization — Only listing owners can edit or delete their listings
+- ✔ Input Validation using Joi schema validation
+- 🔄 RESTful CRUD Architecture
+- 🧹 Cascade Delete — Reviews auto-deleted when listing is removed
+- 💬 Flash Messages for success and error feedback
+- 🎨 Responsive UI with Bootstrap 5
+- ☁️ Session Storage with connect-mongo
+- 🌐 Deployed on Render with MongoDB Atlas
 
 ---
 
-# 🛠 Tech Stack
+🧠 Project Highlights
 
-### Frontend
-- HTML
-- CSS
-- Bootstrap
+- Built a full-stack Airbnb-style platform using Node.js, Express.js, MongoDB, and EJS
+- Implemented user authentication and session management using Passport.js + express-session
+- Integrated Leaflet.js + Nominatim API for free interactive maps with forward geocoding (no API key required)
+- Designed RESTful APIs for listings, reviews, and user auth
+- Implemented role-based authorization — owners can only manage their own listings
+- Integrated Cloudinary + Multer for cloud-based image upload and storage
+- Used MongoDB Atlas for cloud database with connect-mongo for persistent sessions
+- Structured backend using modular MVC architecture (models, routes, controllers, utils)
+- Deployed on Render with environment-based configuration
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+- HTML5
+- CSS3
+- Bootstrap 5
 - EJS Templates
+- JavaScript
 
-### Backend
+## Backend
 - Node.js
 - Express.js
 
-### Database
-- MongoDB
+## Database
+- MongoDB Atlas
 - Mongoose
 
-### Tools & Libraries
-- Cloudinary (Image Storage)
-- Multer (File Uploads)
-- Joi (Validation)
-- Method Override
-- Dotenv
+## Authentication
+- Passport.js
+- Passport Local
+- Passport Local Mongoose
+
+## Cloud & Deployment
+- Cloudinary
+- Multer
+- Render
+
+## Maps & Geocoding
+- Leaflet.js
+- OpenStreetMap
+- Nominatim API
 
 ---
 
-# 📂 Project Architecture
-Major-project
+# 📁 Complete Project Architecture
+
+```bash
+Wanderlust/
 │
-├── models
-│ ├── listing.js
-│ └── reviews.js
+├── cloudinary.js                  # Cloudinary configuration
+├── middleware.js                  # Custom middleware functions
+├── schema.js                      # Joi validation schemas
+├── app.js                         # Main Express application
+├── package.json
+├── package-lock.json
+├── README.md
 │
-├── views
-│ ├── listings
-│ │ ├── index.ejs
-│ │ ├── show.ejs
-│ │ ├── new.ejs
-│ │ └── edit.ejs
-│ │
-│ └── layouts
+├── controller/                    # MVC Controllers
+│   ├── listing.js
+│   ├── review.js
+│   └── users.js
 │
-├── public
-│ └── css / js
+├── init/
+│   ├── data.js                    # Seed data
+│   |__ index.js                   # DB initialization
+│   
 │
-├── utils
-│ ├── wrapasync.js
-│ └── expresserror.js
+├── models/                        # Mongoose Models
+│   ├── listing.js
+│   ├── reviews.js
+│   └── user.js
 │
-├── schema.js
-├── app.js
-└── README.md
-
-
----
-
-# ⚙ How the Application Works
-
-1. Users can explore travel listings on the homepage.
-2. New listings can be created with image uploads stored in **Cloudinary**.
-3. Listings can be edited or deleted.
-4. Users can submit reviews with ratings and comments.
-5. Reviews are stored in **MongoDB** and linked to listings.
-6. When a listing is deleted, all associated reviews are automatically removed.
-
----
-
-
-## ⚙ Installation & Setup
-
-### Clone the repository
-git clone https://github.com/yourusername/wanderlust.git
-
-
-### Navigate into project
-cd wanderlust
-
-### Install dependencies
-npm install
-
-### Create `.env` file
-CLOUD_NAME=your_cloudinary_name
-CLOUD_API_KEY=your_api_key
-CLOUD_API_SECRET=your_api_secret
-
-### Start MongoDB
-mongodb://127.0.0.1:27017/vanderlust
-
-### Run server
-nodemon app.js
-Server runs at:
-http://localhost:8080
-
-
----
-
-# 💡 Key Backend Concepts Implemented
-
-- RESTful API architecture
-- MVC-style project structure
-- Middleware-based error handling
-- Joi schema validation
-- MongoDB relationships using Mongoose
-- Cloudinary image upload integration
-- Async error handling using custom wrapper functions
+├── routes/                        # Express Routes
+│   ├── listing.js
+│   ├── review.js
+│   └── user.js
+│
+├── utils/
+│   ├── expresserror.js            # Custom error class
+│   └── wrapasync.js               # Async wrapper
+│
+├── public/
+│   ├── css/
+│   │   ├── style.css
+│   │   └── rating.css
+│   │
+│   ├── js/
+│       ├── script.js
+│       └── map.js
+│   
+│  
+│
+├── views/
+│   │
+│   ├── includes/
+│   │   ├── navbar.ejs
+│   │   ├── footer.ejs
+│   │   └── flash.ejs
+│   │
+│   ├── layouts/
+│   │   └── boilerplate.ejs
+│   │
+│   ├── listings/
+│   │   ├── index.ejs
+│   │   ├── new.ejs
+│   │   ├── edit.ejs
+│   │   └── show.ejs
+│   │
+│   ├── users/
+│   │   ├── signup.ejs
+│   │   └── login.ejs
+│   │
+│   └── error.ejs
+│
+└── .env
 
 ---
 
-# 🔮 Future Improvements
+⚙ How the Application Works
 
-- 👤 User authentication (Login / Signup)
-- ❤️ Wishlist functionality
-- ⭐ Average rating calculation
-- 🔍 Search and filtering
-- 📍 Map integration
-- 📱 Fully responsive mobile UI
-- 🌐 Deployment (Render / Vercel)
-
----
-
-# 👨‍💻 Author
-
-**Tanvee Rajput**
-
----
-
-# 📜 License
-
-This project is built for educational purposes.
+1. Users sign up / log in securely via Passport.js authentication
+2. Browse all travel listings on the homepage
+3. Create new listings with title, description, price, location, country and image
+4. Image is uploaded to Cloudinary, coordinates fetched via Nominatim geocoding
+5. Each listing page shows details, an interactive Leaflet map, and all reviews
+6. Logged-in users can submit reviews with star ratings
+7. Only the listing owner can edit or delete their listing
+8. Deleting a listing automatically removes all its reviews (cascade delete)
+9.Flash messages give users real-time feedback on all actions
