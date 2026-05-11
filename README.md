@@ -153,7 +153,7 @@ Wanderlust/
 │
 └── .env
 
----
+```
 
 ⚙ How the Application Works
 
@@ -165,4 +165,74 @@ Wanderlust/
 6. Logged-in users can submit reviews with star ratings
 7. Only the listing owner can edit or delete their listing
 8. Deleting a listing automatically removes all its reviews (cascade delete)
-9.Flash messages give users real-time feedback on all actions
+9. Flash messages give users real-time feedback on all actions
+
+---
+
+⚙ Installation & Setup
+1. Clone the repository
+   git clone https://github.com/tanveerajput/Wanderlust.git
+   cd Wanderlust
+    
+2. Install dependencies
+   npm install
+   
+3. Create .env file in root
+   ATLAS_URL=your_mongodb_atlas_connection_string
+   SECRET=your_session_secret
+   CLOUD_NAME=your_cloudinary_cloud_name
+   CLOUD_API_KEY=your_cloudinary_api_key
+   CLOUD_API_SECRET=your_cloudinary_api_secret
+
+4. Seed the database (optional)
+   node seed.js
+   
+6. Start the server
+   nodemon app.js
+
+ Server runs at: http://localhost:8080
+
+ ---
+
+ 💡 Key Backend Concepts Implemented
+
+- MVC-style modular project structure
+- RESTful API architecture (GET, POST, PUT, DELETE)
+- User authentication with Passport.js + passport-local-mongoose
+- Role-based authorization middleware
+- Session management with express-session + connect-mongo
+- Joi schema validation for listings and reviews
+- Custom async error handler (wrapAsync)
+- Centralized error handling middleware
+- GeoJSON geometry storage in MongoDB
+- Cloudinary image upload integration
+- Forward geocoding with Nominatim API
+- Cascade delete using Mongoose post middleware
+
+---
+
+🔮 Future Improvements
+
+❤️ Wishlist / Save listings functionality
+🔍 Search and filtering by location or price
+📊 Average rating calculation per listing
+📱 Progressive Web App (PWA) support
+💳 Payment integration
+🗓 Booking system with date picker
+
+---
+
+👩‍💻 Author
+Tanvee Rajput
+🔗 GitHub
+🌐 Live Project
+
+---
+
+📜 License
+This project is built for educational purposes as part of a full-stack web development learning journey.
+   
+⭐ If you liked this project
+Give this repository a ⭐ on GitHub!
+
+
