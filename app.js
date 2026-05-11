@@ -18,10 +18,8 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 
 const flash = require("connect-flash");
-
 const passport = require("passport");
 const localstrategy = require("passport-local");
-
 const user = require("./models/user.js");
 
 const db_url = process.env.ATLAS_URL;
@@ -31,11 +29,9 @@ async function main() {
     await mongoose.connect(db_url);
     console.log("connected to db");
 
+    // FIX: use mongoUrl instead of client, remove crypto
     const store = MongoStore.create({
-        client: mongoose.connection.getClient(),
-        crypto: {
-            secret: process.env.SECRET || "fallbacksecret",
-        },
+        mongoUrl: db_url,
         touchAfter: 24 * 3600,
     });
 
@@ -78,7 +74,7 @@ async function main() {
         next();
     });
 
-    // ROOT ROUTE — redirects to /listings
+    // root route
     app.get("/", (req, res) => {
         res.redirect("/listings");
     });
@@ -94,9 +90,7 @@ async function main() {
     app.use((err, req, res, next) => {
         const { statusCode = 500, message = "Something went wrong" } = err;
         console.log(err);
-        if (res.headersSent) {
-            return next(err);
-        }
+        if (res.headersSent) return next(err);
         res.status(statusCode).render("error.ejs", { message });
     });
 
