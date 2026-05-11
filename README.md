@@ -33,7 +33,7 @@ A full-stack travel listing web application where users can explore destinations
 
 ---
 
-🧠 Project Highlights
+# 🧠 Project Highlights
 
 - Built a full-stack Airbnb-style platform using Node.js, Express.js, MongoDB, and EJS
 - Implemented user authentication and session management using Passport.js + express-session
@@ -155,7 +155,7 @@ Wanderlust/
 
 ```
 
-⚙ How the Application Works
+# ⚙ How the Application Works
 
 1. Users sign up / log in securely via Passport.js authentication
 2. Browse all travel listings on the homepage
@@ -169,7 +169,7 @@ Wanderlust/
 
 ---
 
-⚙ Installation & Setup
+# ⚙ Installation & Setup
 1. Clone the repository
    git clone https://github.com/tanveerajput/Wanderlust.git
    cd Wanderlust
@@ -194,7 +194,7 @@ Wanderlust/
 
  ---
 
- 💡 Key Backend Concepts Implemented
+# 💡 Key Backend Concepts Implemented
 
 - MVC-style modular project structure
 - RESTful API architecture (GET, POST, PUT, DELETE)
@@ -211,7 +211,7 @@ Wanderlust/
 
 ---
 
-🔮 Future Improvements
+# 🔮 Future Improvements
 
 ❤️ Wishlist / Save listings functionality
 🔍 Search and filtering by location or price
@@ -222,17 +222,18 @@ Wanderlust/
 
 ---
 
-👩‍💻 Author
-Tanvee Rajput
-🔗 GitHub
-🌐 Live Project
+# 👩‍💻 Author
+  Tanvee Rajput
+  🔗 GitHub
+  🌐 Live Project
 
 ---
 
-📜 License
-This project is built for educational purposes as part of a full-stack web development learning journey.
+# 📜 License
+
+   This project is built for educational purposes as part of a full-stack web development learning journey.
    
-⭐ If you liked this project
-Give this repository a ⭐ on GitHub!
+# ⭐ If you liked this project
+   Give this repository a ⭐ on GitHub!
 
 
