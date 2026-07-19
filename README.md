@@ -224,7 +224,7 @@ Wanderlust/
 
 # 👩‍💻 Author
   Tanvee Rajput
-  🔗 GitHub
+  🔗 https://github.com/tanveerajput/Wanderlust
   🌐 Live Project
 
 ---
