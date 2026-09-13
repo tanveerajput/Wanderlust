@@ -31,8 +31,9 @@ router
 .route("/:id")
 .get(wrapasync(listingcontroller.showListing))
 .put(
-isLoggedIn,isowner,validatelisting,
-  upload.single("image"),
+isLoggedIn,isowner,
+  upload.single("image"),   // ⭐ multer must come first
+  validatelisting,
  wrapasync(listingcontroller.updateListing)
 )
 .delete(

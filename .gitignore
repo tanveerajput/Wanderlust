@@ -10,5 +10,3 @@ node_modules/
 # Logs
 npm-debug.log*
 
-# Optional
-package-lock.json
