@@ -33,6 +33,10 @@ jobs:
           path: ~/.cache/mongodb-binaries
           key: ${{ runner.os }}-mongodb-binaries
 
-       - run: npm install --no-audit --no-fund
+      # npm ci requires every platform's optional deps in the lockfile. This
+      # lockfile is generated on Windows, which resolves @emnapi/core and
+      # @emnapi/runtime as requirements but never writes them as entries
+      # (they're Linux-only), so npm ci fails on the Ubuntu runner.
+      - run: npm install --no-audit --no-fund
 
       - run: npm test
