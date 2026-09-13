@@ -33,6 +33,6 @@ jobs:
           path: ~/.cache/mongodb-binaries
           key: ${{ runner.os }}-mongodb-binaries
 
-      - run: npm ci
+       - run: npm install --no-audit --no-fund
 
       - run: npm test
