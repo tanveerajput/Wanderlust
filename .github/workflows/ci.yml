@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      # app.js validates ATLAS_URL at module load and exits if it's missing.
+      # Under NODE_ENV=test no real connection is made, so a dummy value is
+      # enough to get past the guard.
+      ATLAS_URL: mongodb://127.0.0.1:27017/ci-placeholder
+      SECRET: ci-test-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # mongodb-memory-server downloads a ~90MB mongod binary on first run.
+      # Caching it cuts about 30 seconds off every subsequent build.
+      - name: Cache mongodb-memory-server binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongodb-binaries
+
+      - run: npm ci
+
+      - run: npm test
