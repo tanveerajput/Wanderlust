@@ -1,3 +1,5 @@
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 require("dotenv").config();
 
 const express = require("express");
@@ -24,12 +26,21 @@ const user = require("./models/user.js");
 
 const db_url = process.env.ATLAS_URL;
 
-async function main() {
+// Fail fast with a readable message instead of a driver stack trace
+if (!db_url) {
+    console.error("FATAL: ATLAS_URL is not set. Check your .env file.");
+    process.exit(1);
+}
+if (!db_url.startsWith("mongodb://") && !db_url.startsWith("mongodb+srv://")) {
+    console.error("FATAL: ATLAS_URL has a bad scheme. It starts with:",
+        JSON.stringify(db_url.substring(0, 25)));
+    process.exit(1);
+}
 
+async function main() {
     await mongoose.connect(db_url);
     console.log("connected to db");
 
-    // FIX: use mongoUrl instead of client, remove crypto
     const store = MongoStore.create({
         mongoUrl: db_url,
         touchAfter: 24 * 3600,
@@ -74,7 +85,6 @@ async function main() {
         next();
     });
 
-    // root route
     app.get("/", (req, res) => {
         res.redirect("/listings");
     });
