@@ -36,6 +36,7 @@
     "passport-local-mongoose": "^9.1.0"
   },
   "devDependencies": {
+    "autocannon": "^8.0.0",
     "cross-env": "^10.1.0",
     "jest": "^30.5.1",
     "mongodb-memory-server": "^11.2.0",
