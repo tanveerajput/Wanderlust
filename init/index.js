@@ -1,5 +1,5 @@
 // Load .env from the project root, regardless of where this is run from
-require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
+require("dotenv").config({ path: require("path").join(__dirname, "..", ".env"), quiet: true });
 
 // Same DNS override as app.js — this script opens its own connection
 const dns = require("dns");
