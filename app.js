@@ -20,6 +20,7 @@ const expresserror = require("./utils/expresserror.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const bookingRouter = require("./routes/booking.js");
+const myBookingsRouter = require("./routes/mybookings.js");
 const userRouter = require("./routes/user.js");
 
 const session = require("express-session");
@@ -110,6 +111,7 @@ app.get("/", (req, res) => {
 app.use("/listings", listingRouter);
 app.use("/listings", reviewRouter);
 app.use("/listings", bookingRouter);
+app.use("/bookings", myBookingsRouter);
 app.use("/", userRouter);
 
 app.use((req, res, next) => {
@@ -120,6 +122,10 @@ app.use((err, req, res, next) => {
     const { statusCode = 500, message = "Something went wrong" } = err;
     console.log(err);
     if (res.headersSent) return next(err);
+    // Fetch clients that ask for JSON (the booking widget) get the error as data.
+    if (req.accepts(["html", "json"]) === "json") {
+        return res.status(statusCode).json({ message, unavailableDates: err.unavailableDates });
+    }
     res.status(statusCode).render("error.ejs", { message });
 });
 

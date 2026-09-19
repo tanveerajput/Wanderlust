@@ -1,0 +1,28 @@
+<%# Booking widget for listings/show.ejs. Owners never see it; visitors are asked to log in. %>
+<% const isListingOwner = currUser && llisting.owner && llisting.owner._id.equals(currUser._id); %>
+<% if (!isListingOwner) { %>
+<div class="col-6 offset-3 mb-3" id="booking-section">
+    <hr/>
+    <h4>Book this stay</h4>
+    <% if (!currUser) { %>
+        <p><a href="/login">Log in</a> to book this stay.</p>
+    <% } else { %>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
+        <div id="booking-widget"
+             data-listing-id="<%= llisting._id %>"
+             data-price="<%= llisting.price || 0 %>">
+            <div id="booking-alert" class="alert d-none" role="alert" aria-live="polite"></div>
+            <form id="booking-form" novalidate>
+                <label for="booking-range" class="form-label">Check-in &rarr; check-out</label>
+                <input id="booking-range" type="text" class="form-control mb-2"
+                       placeholder="Select your dates" readonly autocomplete="off"/>
+                <p class="text-muted small mb-2">Greyed-out dates are already booked. Maximum stay is 30 nights.</p>
+                <p id="booking-price" class="fw-semibold mb-3">Select dates to see the price.</p>
+                <button id="booking-submit" type="submit" class="btn btn-dark" disabled>Reserve</button>
+            </form>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+        <script src="/js/booking.js"></script>
+    <% } %>
+</div>
+<% } %>
