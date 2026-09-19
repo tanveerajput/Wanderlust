@@ -41,6 +41,21 @@ function expandNights(checkIn, checkOut) {
 
 const toDateKey = (date) => date.toISOString().slice(0, 10);
 
+// Stored nights are UTC midnight, so they must be formatted in UTC too or they
+// would display as the previous day west of Greenwich.
+const formatNight = (date) =>
+    new Date(date).toLocaleDateString("en-IN", {
+        timeZone: "UTC",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+
+const startOfTodayUTC = () => {
+    const now = new Date();
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+};
+
 const isDuplicateKey = (err) =>
     err?.code === 11000 || err?.writeErrors?.some((e) => e.code === 11000);
 
@@ -123,7 +138,10 @@ module.exports.createBooking = async (req, res) => {
         const list = taken.length
             ? taken.map((t) => toDateKey(t.date)).join(", ")
             : `${toDateKey(checkIn)} to ${toDateKey(checkOut)}`;
-        throw new expresserror(409, `These dates are no longer available: ${list}`);
+        const conflict = new expresserror(409, `These dates are no longer available: ${list}`);
+        // Machine-readable copy of the same nights, for the booking widget.
+        conflict.unavailableDates = taken.map((t) => toDateKey(t.date));
+        throw conflict;
     }
 
     // JSON clients get 201 + the booking; browsers get the usual flash + redirect.
@@ -155,7 +173,7 @@ module.exports.cancelBooking = async (req, res) => {
     });
 
     req.flash("success", "Booking cancelled");
-    return res.redirect(`/listings/${id}`);
+    return res.redirect("/bookings");
 };
 
 // month is "YYYY-MM"; returns the booked nights in it as "YYYY-MM-DD" strings.
@@ -177,4 +195,30 @@ module.exports.getAvailability = getAvailability;
 module.exports.showAvailability = async (req, res) => {
     const bookedDates = await getAvailability(req.params.id, req.query.month);
     return res.json({ month: req.query.month, bookedDates });
+};
+
+module.exports.listMyBookings = async (req, res) => {
+    const bookings = await Booking.find({ user: req.user._id })
+        .populate("listing", "title location country")
+        .sort({ checkIn: 1 });
+
+    // A stay counts as upcoming until its check-out day; cancelled ones never do.
+    const today = startOfTodayUTC();
+    const isUpcoming = (b) => b.status === "confirmed" && b.checkOut > today;
+    const upcoming = bookings.filter(isUpcoming);
+    const pastOrCancelled = bookings.filter((b) => !isUpcoming(b)).reverse();
+
+    return res.render("bookings/index.ejs", { upcoming, pastOrCancelled, fmt: formatNight });
+};
+
+module.exports.showBooking = async (req, res) => {
+    const { bookingId } = req.params;
+    const booking = mongoose.isValidObjectId(bookingId)
+        ? await Booking.findById(bookingId).populate("listing", "title location country price")
+        : null;
+    if (!booking) throw new expresserror(404, "Booking not found");
+    if (!booking.user.equals(req.user._id)) {
+        throw new expresserror(403, "You can only view your own bookings");
+    }
+    return res.render("bookings/show.ejs", { booking, fmt: formatNight });
 };

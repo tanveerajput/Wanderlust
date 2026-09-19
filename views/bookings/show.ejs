@@ -1,0 +1,27 @@
+<% layout("/layouts/boilerplate")%>
+<div class="row mt-3">
+    <div class="col-6 offset-3">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <%= booking.status === "confirmed" ? "Booking confirmed" : "Booking cancelled" %>
+                </h3>
+                <% if (booking.listing) { %>
+                    <p class="mb-1"><b><a href="/listings/<%= booking.listing._id %>"><%= booking.listing.title %></a></b></p>
+                    <p class="text-muted"><%= booking.listing.location %>, <%= booking.listing.country %></p>
+                <% } else { %>
+                    <p class="text-muted">Listing no longer available</p>
+                <% } %>
+                <ul class="list-unstyled mb-3">
+                    <li>Check-in: <b><%= fmt(booking.checkIn) %></b></li>
+                    <li>Check-out: <b><%= fmt(booking.checkOut) %></b></li>
+                    <li>Nights: <b><%= booking.nights %></b></li>
+                    <li>Total: <b>₹ <%= (booking.totalPrice || 0).toLocaleString("en-IN") %></b></li>
+                    <li class="text-muted small">Booking reference: <%= booking._id %></li>
+                </ul>
+                <a href="/bookings" class="btn btn-dark">View my bookings</a>
+                <a href="/listings" class="btn btn-outline-dark">Keep exploring</a>
+            </div>
+        </div>
+    </div>
+</div>

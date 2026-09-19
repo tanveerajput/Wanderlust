@@ -1,0 +1,44 @@
+<% layout("/layouts/boilerplate")%>
+<%# Renders one booking row. Cancel is offered only for upcoming stays. %>
+<% const row = (b, canCancel) => { %>
+    <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-start flex-wrap">
+            <div>
+                <% if (b.listing) { %>
+                    <h5 class="card-title mb-1"><a href="/listings/<%= b.listing._id %>"><%= b.listing.title %></a></h5>
+                    <p class="text-muted mb-1"><%= b.listing.location %>, <%= b.listing.country %></p>
+                <% } else { %>
+                    <h5 class="card-title mb-1">Listing no longer available</h5>
+                <% } %>
+                <p class="mb-1"><%= fmt(b.checkIn) %> &rarr; <%= fmt(b.checkOut) %> (<%= b.nights %> night<%= b.nights === 1 ? "" : "s" %>)</p>
+                <p class="mb-0">Total: ₹ <%= (b.totalPrice || 0).toLocaleString("en-IN") %>
+                    <% if (b.status === "cancelled") { %><span class="badge text-bg-secondary ms-2">Cancelled</span><% } %>
+                </p>
+            </div>
+            <% if (canCancel && b.listing) { %>
+                <form method="POST" action="/listings/<%= b.listing._id %>/bookings/<%= b._id %>?_method=DELETE"
+                      onsubmit="return confirm('Cancel this booking?');">
+                    <button class="btn btn-outline-danger btn-sm">Cancel booking</button>
+                </form>
+            <% } %>
+        </div>
+    </div>
+<% }; %>
+
+<div class="row mt-3">
+    <div class="col-8 offset-2">
+        <h3>My bookings</h3>
+
+        <h4 class="mt-4" id="upcoming-bookings">Upcoming</h4>
+        <% if (upcoming.length === 0) { %>
+            <p class="text-muted">No upcoming bookings. <a href="/listings">Explore stays</a></p>
+        <% } %>
+        <% upcoming.forEach((b) => row(b, true)); %>
+
+        <h4 class="mt-4" id="past-bookings">Past and cancelled</h4>
+        <% if (pastOrCancelled.length === 0) { %>
+            <p class="text-muted">Nothing here yet.</p>
+        <% } %>
+        <% pastOrCancelled.forEach((b) => row(b, false)); %>
+    </div>
+</div>
