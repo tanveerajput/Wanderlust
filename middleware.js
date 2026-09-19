@@ -1,7 +1,7 @@
  const listing = require("./models/listing.js");
  
  const expresserror=require("./utils/expresserror.js");
-const{ listingschema,reviewSchema}=require("./schema.js");
+const{ listingschema,reviewSchema,bookingSchema}=require("./schema.js");
 const reviews = require("./models/reviews.js");
 
 
@@ -57,6 +57,18 @@ next();
   }
  } ;
  
+
+ module.exports.validateBooking=(req,res,next)=>{
+ let {error} =bookingSchema.validate(req.body);
+  if(error){
+   let errmsg=error.details.map((el)=> el.message).join(".");
+   throw new expresserror(400,errmsg);
+  }
+  else{
+   next();
+  }
+ } ;
+
 
  module.exports.isReviewAuthor=async(req,res,next)=>{
     let { id,reviewId } = req.params;//id will come from req ke parameters

@@ -1,8 +1,5 @@
 const os = require("os");
 const mongoose = require("mongoose");
-const { MongoMemoryServer } = require("mongodb-memory-server");
-
-let mongod;
 
 // Registered via setupFilesAfterEnv, so this beforeAll is queued before any
 // test file's own beforeAll/it blocks. Jest requires every test file (which
@@ -13,8 +10,8 @@ let mongod;
 // hooks to completion before any test body executes, every request made
 // inside an it() is guaranteed to run against an already-open connection.
 beforeAll(async () => {
-    mongod = await MongoMemoryServer.create();
-    await mongoose.connect(mongod.getUri(), {
+    // The replica set is started once by tests/globalSetup.js (transactions need one).
+    await mongoose.connect(process.env.MONGO_URI_TEST, {
         // Without this, connect() hangs/fails here (verified: removing it
         // reproduces the failure) - see driver's client_metadata dynamic import.
         runtimeAdapters: { os },
@@ -30,7 +27,4 @@ afterEach(async () => {
 
 afterAll(async () => {
     await mongoose.disconnect();
-    if (mongod) {
-        await mongod.stop();
-    }
 });
