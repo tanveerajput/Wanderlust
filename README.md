@@ -6,7 +6,6 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
 ![EJS](https://img.shields.io/badge/EJS-Templating-red)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-Image%20Storage-blue)
-![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen)
 
 A full-stack travel listing web application where users can explore destinations, create listings, upload images, leave reviews, authenticate securely, and view locations on an interactive map.
 
@@ -37,9 +36,10 @@ A full-stack travel listing web application where users can explore destinations
 # 🧠 Project Highlights
 
 - Built a full-stack Airbnb-style platform using Node.js, Express.js, MongoDB, and EJS
-- Wrote 15 integration tests (Jest + Supertest + mongodb-memory-server) covering the
-  authorization boundary, cascade deletion, and validation — each authorization test
-  verified to fail when its guard middleware is removed
+- Wrote an integration and concurrency test suite (Jest + Supertest + mongodb-memory-server)
+  covering auth, listings, reviews, pagination, and transactional booking — including a
+  50-concurrent-request double-booking test — with the authorization and booking tests
+  each verified to fail when the guard or unique index they protect is removed
 - Configured GitHub Actions CI to run the full suite on every push and pull request
 - Implemented user authentication and session management using Passport.js + express-session
 - Integrated Leaflet.js + Nominatim API for free interactive maps with forward geocoding (no API key required)
@@ -77,7 +77,7 @@ A full-stack travel listing web application where users can explore destinations
 ## Testing & CI
 - Jest
 - Supertest
-- mongodb-memory-server
+- mongodb-memory-server (`MongoMemoryReplSet`, since booking transactions need a replica set)
 - GitHub Actions
 
 ## Cloud & Deployment
@@ -261,10 +261,95 @@ Server runs at **http://localhost:8080**
 
 ---
 
+# 🗓️ Booking System
+
+Guests can book a listing for a range of nights. The design goal is that
+**double-booking is impossible at the database level**, not merely prevented by
+application code.
+
+| Route | Purpose |
+|---|---|
+| `POST /listings/:id/bookings` | create a booking (`booking[checkIn]`, `booking[checkOut]` as `YYYY-MM-DD`) |
+| `DELETE /listings/:id/bookings/:bookingId` | cancel your own booking and free its nights |
+| `GET /listings/:id/availability?month=YYYY-MM` | booked nights for a calendar month |
+
+### How double-booking is prevented
+
+Each booking is stored as one `Booking` document plus one `BookedDate` document
+**per listing per night**. `BookedDate` has a unique compound index on
+`(listing, date)`, so MongoDB itself rejects a second insert for the same
+listing and night. Two concurrent bookings for overlapping dates cannot both
+succeed regardless of timing, because the second insert violates the index —
+this is enforcement at the storage layer, not a check-then-write race in
+application code.
+
+Creating a booking runs inside a single Mongoose transaction: load the listing,
+reject the owner booking their own listing (400), create the `Booking`, then
+`insertMany` the nights. A duplicate-key error (code `11000`) aborts the
+transaction and returns **409 Conflict** naming the unavailable nights.
+Transient transaction errors and write conflicts are retried up to 3 times with
+100 / 200 / 400 ms backoff. Stays are half-open `[checkIn, checkOut)`: the
+check-out day is not a booked night, so back-to-back stays do not conflict.
+
+### Date handling
+
+Only `YYYY-MM-DD` calendar dates are accepted. They are converted with
+`Date.UTC(y, m, d)` from the literal digits, never through a local time zone, so
+a booking made from IST and one made from UTC produce identical date keys. A
+full timestamp such as `2027-06-14T18:30:00.000Z` is rejected with 400, because
+accepting it would silently move the booking onto a different night. Check-in
+must not be in the past and the maximum stay is 30 nights (Joi, `schema.js`).
+
+### Proving it works
+
+- **Concurrency test** (`tests/booking.concurrency.test.js`): 50 different users
+  fire 50 simultaneous booking requests for the same dates on one listing.
+  Exactly **one** gets `201` and the other 49 get `409`. The test also asserts
+  that only one set of nights is stored (not 50 sets) and that exactly one
+  confirmed booking exists.
+- **Mutation check:** with `unique: true` temporarily removed from the index,
+  all 50 requests returned `201` and the test failed. This confirms the test
+  detects the vulnerability instead of passing incidentally.
+- **Other cases covered:** partial overlap → 409, adjacent stays → 201, cancel
+  then rebook the same dates → 201, check-in after check-out → 400, booking your
+  own listing → 400, and `getAvailability` returning exactly the booked nights
+  of a month with no leakage from other listings.
+
+### IST / UTC investigation
+
+The date-key tests were also checked by mutation. Replacing the UTC conversion
+with a local-midnight `new Date(y, m, d)` made three tests fail, including the
+IST-vs-UTC test, which asserts the stored value is exactly
+`YYYY-MM-15T00:00:00.000Z`. Replacing it with `new Date(value)` is not
+detectable: for a date-only string JavaScript already parses UTC midnight, so
+the result is identical, and the timestamp-rejection test is what guards the
+input format instead.
+
+To make this class of bug fail everywhere, the test scripts in `package.json`
+pin the time zone: `cross-env NODE_ENV=test TZ=Asia/Kolkata jest`. CI runners
+default to UTC, so without the pin a local-time mistake could pass in CI and
+fail on a developer's IST machine, or the reverse.
+
+### Test infrastructure: replica set required
+
+MongoDB rejects multi-document transactions on a standalone server, so the test
+database is a single-node `MongoMemoryReplSet`. It is started once in
+`tests/globalSetup.js` (and stopped in `tests/globalTeardown.js`), not in
+`tests/setup.js`, because `MongoMemoryReplSet.create()` hangs when run inside a
+Jest test file's VM context. `tests/setup.js` connects to the URI exposed as
+`MONGO_URI_TEST`. Production runs on MongoDB Atlas, which supports transactions.
+
+---
+
 # 🧪 Testing
 
-15 integration tests using Jest, Supertest and mongodb-memory-server. Tests run
-against a real in-memory MongoDB instance — no mocking of the database layer.
+An integration and concurrency test suite using Jest, Supertest and
+mongodb-memory-server, covering auth, listings, reviews, pagination, and
+transactional booking. Tests run against a real in-memory MongoDB instance — no
+mocking of the database layer. Because the booking flow uses multi-document
+transactions, which MongoDB only allows on a replica set, the suite runs on a
+single-node `MongoMemoryReplSet` (started once in `tests/globalSetup.js`) rather
+than a standalone server.
 
 ```bash
 npm test          # run once
