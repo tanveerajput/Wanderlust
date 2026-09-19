@@ -19,6 +19,7 @@ const expresserror = require("./utils/expresserror.js");
 
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
+const bookingRouter = require("./routes/booking.js");
 const userRouter = require("./routes/user.js");
 
 const session = require("express-session");
@@ -108,6 +109,7 @@ app.get("/", (req, res) => {
 
 app.use("/listings", listingRouter);
 app.use("/listings", reviewRouter);
+app.use("/listings", bookingRouter);
 app.use("/", userRouter);
 
 app.use((req, res, next) => {
