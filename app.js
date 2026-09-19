@@ -4,9 +4,13 @@ const dns = require("dns");
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const express = require("express");
+const compression = require("compression");
 const app = express();
 
 const mongoose = require("mongoose");
+if (process.env.NODE_ENV === "development") {
+    mongoose.set("debug", true);
+}
 const path = require("path");
 const methodoverride = require("method-override");
 const ejsmate = require("ejs-mate");
@@ -76,6 +80,7 @@ const sessionoptions = {
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodoverride("_method"));
 app.engine("ejs", ejsmate);

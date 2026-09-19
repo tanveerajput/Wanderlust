@@ -4,8 +4,16 @@ const axios = require("axios");
 const expresserror = require("../utils/expresserror.js");
 
 module.exports.index = async (req, res) => {
-    const allListings = await listing.find({});
-    res.render("listings/index.ejs", { allListings });
+    const perPage = 20;
+    const totalListings = await listing.countDocuments({});
+    const totalPages = Math.max(1, Math.ceil(totalListings / perPage));
+    const requested = parseInt(req.query.page, 10);
+    const page = Math.min(Math.max(Number.isNaN(requested) ? 1 : requested, 1), totalPages);
+    const allListings = await listing.find({})
+        .sort({ _id: 1 })
+        .skip((page - 1) * perPage)
+        .limit(perPage);
+    res.render("listings/index.ejs", { allListings, page, totalPages, totalListings });
 };
 
 module.exports.renderForm = (req, res) => {
